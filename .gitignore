@@ -1,0 +1,6 @@
+# composer files
+vendor
+composer.lock
+
+# enviroment data
+phpunit.xml
