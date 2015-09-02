@@ -66,6 +66,28 @@ class PathDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('api/some/url/default.json content', $data);
     }
 
+    public function testCustomPostfix()
+    {
+        $filesystem = $this->filesystem([
+            'api/some/url/default.txt' => 'plain text'
+        ]);
+        $provider = new PathDataProvider($filesystem, [], '.txt');
+
+        $data = $provider->data($this->request('/api/some/url'));
+        $this->assertEquals('plain text', $data);
+    }
+
+    public function testDefaultPostfix()
+    {
+        $filesystem = $this->filesystem([
+            'api/some/url/default.json' => 'some json'
+        ]);
+        $provider = new PathDataProvider($filesystem);
+
+        $data = $provider->data($this->request('/api/some/url'));
+        $this->assertEquals('some json', $data);
+    }
+
     /**
      * @param string $url
      * @param array $get

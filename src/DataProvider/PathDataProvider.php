@@ -18,30 +18,37 @@ class PathDataProvider
     protected $parameters;
 
     /**
+     * @var string
+     */
+    protected $postfix;
+
+    /**
      * @param FilesystemInterface $filesystem
      * @param string[] $parameters
+     * @param string $postfix
      */
-    public function __construct(FilesystemInterface $filesystem, $parameters = [])
+    public function __construct(FilesystemInterface $filesystem, $parameters = [], $postfix = '.json')
     {
         $this->filesystem = $filesystem;
         $this->parameters = $parameters;
+        $this->postfix = $postfix;
     }
 
     /**
      * @param ServerRequestInterface $request
-     * 
+     *
      * @return mixed|null
      */
     public function data(ServerRequestInterface $request)
     {
         $url = $request->getUri()->getPath();
         $parameters = array_merge($request->getQueryParams(), $request->getParsedBody());
-        
+
         $file = $this->file($url, $parameters);
         if (!$this->filesystem->has($file)) {
             $file = $this->defaultFile($url);
         }
-        
+
         if (!$this->filesystem->has($file)) {
             return null;
         }
@@ -51,7 +58,7 @@ class PathDataProvider
 
     /**
      * @param string $url
-     * 
+     *
      * @return string
      */
     protected function defaultFile($url)
@@ -62,13 +69,13 @@ class PathDataProvider
     /**
      * @param string $url
      * @param array $parameters
-     * 
+     *
      * @return string
      */
     protected function file($url, $parameters = [])
     {
         $directory = trim($url, '/');
-        
+
         $file = '';
         foreach ($this->parameters as $parameter) {
             if (isset($parameters[$parameter])) {
@@ -78,7 +85,7 @@ class PathDataProvider
         if (empty($file)) {
             $file = 'default';
         }
-        $file = rtrim($file, '_') . '.json';
+        $file = rtrim($file, '_') . $this->postfix;
 
         return $directory . '/' . $file;
     }
