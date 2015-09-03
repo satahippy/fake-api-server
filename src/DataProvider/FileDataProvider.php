@@ -5,7 +5,7 @@ namespace Sata\FakeServerApi\DataProvider;
 use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class FileDataProvider
+class FileDataProvider implements IDataProvider
 {
     /**
      * @var FilesystemInterface
