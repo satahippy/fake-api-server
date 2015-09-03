@@ -13,9 +13,9 @@ trait MocksTrait
      * @param array $get
      * @param array $post
      *
-     * @return ServerRequestInterface
+     * @return ServerRequestInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function request($url = '', $get = [], $post = [])
+    protected function request($url = '', $get = [], $post = [], $method = 'GET')
     {
         $uri = $this->getMock('\Psr\Http\Message\UriInterface');
         $uri->method('getPath')
@@ -28,6 +28,12 @@ trait MocksTrait
             ->willReturn($get);
         $request->method('getParsedBody')
             ->willReturn($post);
+        $request->method('getMethod')
+            ->willReturn($method);
+        $request->method('withQueryParams')
+            ->willReturnCallback(function ($get) use ($url, $post, $method) {
+                return $this->request($url, $get, $post, $method);
+            });
 
         return $request;
     }
