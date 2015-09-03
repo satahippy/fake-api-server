@@ -4,6 +4,7 @@ namespace Sata\FakeServerApi\Test;
 
 use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Sata\FakeServerApi\DataProvider\IDataProvider;
 
 trait MocksTrait
 {
@@ -49,5 +50,19 @@ trait MocksTrait
             });
 
         return $filesystem;
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return IDataProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function dataProvider($data)
+    {
+        $provider = $this->getMock('\Sata\FakeServerApi\DataProvider\IDataProvider');
+        $provider->method('data')
+            ->willReturn($data);
+
+        return $provider;
     }
 }
