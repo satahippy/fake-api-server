@@ -2,12 +2,13 @@
 
 namespace Sata\FakeServerApi\Test\Unit\DataProvider;
 
-use League\Flysystem\FilesystemInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Sata\FakeServerApi\DataProvider\PathDataProvider;
+use Sata\FakeServerApi\Test\MocksTrait;
 
 class PathDataProviderTest extends \PHPUnit_Framework_TestCase
 {
+    use MocksTrait;
+    
     public function testDataReturnsFileContent()
     {
         $filesystem = $this->filesystem([
@@ -86,49 +87,5 @@ class PathDataProviderTest extends \PHPUnit_Framework_TestCase
 
         $data = $provider->data($this->request('/api/some/url'));
         $this->assertEquals('some json', $data);
-    }
-
-    /**
-     * @param string $url
-     * @param array $get
-     * @param array $post
-     * 
-     * @return ServerRequestInterface
-     */
-    protected function request($url, $get = [], $post = [])
-    {
-        $uri = $this->getMock('\Psr\Http\Message\UriInterface');
-        $uri->method('getPath')
-            ->willReturn($url);
-
-        $request = $this->getMock('\Psr\Http\Message\ServerRequestInterface');
-        $request->method('getUri')
-            ->willReturn($uri);
-        $request->method('getQueryParams')
-            ->willReturn($get);
-        $request->method('getParsedBody')
-            ->willReturn($post);
-
-        return $request;
-    }
-
-    /**
-     * @param array $files
-     * 
-     * @return FilesystemInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function filesystem($files = [])
-    {
-        $filesystem = $this->getMock('\League\Flysystem\FilesystemInterface');
-        $filesystem->method('read')
-            ->willReturnCallback(function ($path) use ($files) {
-                return $files[$path];
-            });
-        $filesystem->method('has')
-            ->willReturnCallback(function ($path) use ($files) {
-                return isset($files[$path]);
-            });
-
-        return $filesystem;
     }
 }
