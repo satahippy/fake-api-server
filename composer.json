@@ -1,5 +1,5 @@
 {
-  "name": "sata/fake-api-server",
+  "name": "satahippy/fake-api-server",
   "description": "Fake your API. Primarily for frontend development.",
   "authors": [
     {
