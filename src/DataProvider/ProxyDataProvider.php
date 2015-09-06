@@ -62,14 +62,11 @@ class ProxyDataProvider implements IDataProvider
      */
     public function requestHash(ServerRequestInterface $request)
     {
-        $uri = $request->getUri();
-        $get = $request->getQueryParams();
-        $post = $request->getParsedBody();
-
         $hash = [
-            'path' => $uri->getPath(),
-            'get' => $get,
-            'post' => $post
+            'path' => $request->getUri()->getPath(),
+            'method' => $request->getMethod(),
+            'get' => $request->getQueryParams(),
+            'post' => $request->getParsedBody()
         ];
 
         return serialize($hash);
