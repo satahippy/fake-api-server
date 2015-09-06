@@ -2,6 +2,7 @@
 
 namespace Sata\FakeServerApi\DataProvider;
 
+use Doctrine\Common\Cache\Cache;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use Psr\Http\Message\ServerRequestInterface;
@@ -12,10 +13,16 @@ class ProxyDataProvider implements IDataProvider
      * @var ClientInterface
      */
     protected $guzzle;
+    
+    /**
+     * @var Cache
+     */
+    protected $cache;
 
-    public function __construct(ClientInterface $guzzle)
+    public function __construct(ClientInterface $guzzle, Cache $cache)
     {
         $this->guzzle = $guzzle;
+        $this->cache = $cache;
     }
 
     /**
@@ -25,6 +32,11 @@ class ProxyDataProvider implements IDataProvider
      */
     public function data(ServerRequestInterface $request)
     {
+        $hash = $this->requestHash($request);
+        if ($this->cache->contains($hash)) {
+            return $this->cache->fetch($hash);
+        }
+
         $request = $request->withUri(
             $request->getUri()
                 ->withHost('')
@@ -37,6 +49,28 @@ class ProxyDataProvider implements IDataProvider
             $response = $exception->getResponse();
         }
 
-        return (string)$response->getBody();
+        $responseBody = (string)$response->getBody();
+        $this->cache->save($hash, $responseBody);
+        return $responseBody;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * 
+     * @return string
+     */
+    public function requestHash(ServerRequestInterface $request)
+    {
+        $uri = $request->getUri();
+        $get = $request->getQueryParams();
+        $post = $request->getParsedBody();
+
+        $hash = [
+            'path' => $uri->getPath(),
+            'get' => $get,
+            'post' => $post
+        ];
+
+        return serialize($hash);
     }
 }
