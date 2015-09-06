@@ -42,7 +42,8 @@ class ProxyDataProvider implements IDataProvider
                 ->withHost('')
                 ->withPort(80)
                 ->withScheme('')
-        );
+        )->withoutHeader('Host');
+
         try {
             $response = $this->guzzle->send($request);
         } catch (BadResponseException $exception) {
