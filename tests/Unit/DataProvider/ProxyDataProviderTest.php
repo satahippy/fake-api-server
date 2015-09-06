@@ -18,7 +18,8 @@ class ProxyDataProviderTest extends \PHPUnit_Framework_TestCase
             '/api/some/url' => 'api/some/url content',
             '/api/another/url' => 'api/another/url content',
         ]);
-        $provider = new ProxyDataProvider($guzzle);
+        $cache = $this->cache();
+        $provider = new ProxyDataProvider($guzzle, $cache);
         
         $request = $this->request('/api/some/url');
         $data = $provider->data($request);
@@ -38,7 +39,8 @@ class ProxyDataProviderTest extends \PHPUnit_Framework_TestCase
                 $this->request(),
                 $this->response('body with exception')
             ));
-        $provider = new ProxyDataProvider($guzzle);
+        $cache = $this->cache();
+        $provider = new ProxyDataProvider($guzzle, $cache);
 
         $request = $this->request('/api/some/url');
         $data = $provider->data($request);

@@ -2,6 +2,7 @@
 
 namespace Sata\FakeServerApi\Test;
 
+use Doctrine\Common\Cache\Cache;
 use GuzzleHttp\ClientInterface;
 use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\RequestInterface;
@@ -90,10 +91,21 @@ trait MocksTrait
         $guzzle->method('send')
             ->willReturnCallback(function (RequestInterface $request) use ($responses) {
                 $responseBody = $responses[$request->getUri()->getPath()];
+
                 return $this->response($responseBody);
             });
 
         return $guzzle;
+    }
+
+    /**
+     * @return Cache|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function cache()
+    {
+        $cache = $this->getMock('\Doctrine\Common\Cache\Cache');
+
+        return $cache;
     }
 
     /**
